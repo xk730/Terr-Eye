@@ -1,5 +1,8 @@
 import os
 import requests
+import time
+import itertools
+import datetime
 
 # API URLs
 version_api_url = "https://terraria.org/api/get/dedicated-servers-names"
@@ -43,7 +46,7 @@ def get_local_versions(directory):
         try:
             with open(log_file, 'r') as log:
                 for line in log:
-                    if line.startswith("version = "):
+                    if line.startswith("last_down_version = "):
                         version = line.split("=")[1].strip()
                         local_versions.append(version)
                         print(f"从日志文件中读取到版本: {version}")
@@ -55,13 +58,7 @@ def get_local_versions(directory):
 
     return local_versions
 
-import time
 
-import time
-import itertools
-
-import time
-import itertools
 
 def download_file(filename):
     url = download_base_url + filename
@@ -103,12 +100,36 @@ def download_file(filename):
 
 def log_version(version):
     print(f"记录最新版本号: {version}")
-    with open(log_file, 'w') as log:  # 使用 'w' 模式(覆盖owo)
-        log.write(f"version = {version}\n")
-        log.write(f"xk730 = kyzh0730@gmail.com\n")
+    
+    # 读取现有的日志文件内容
+    try:
+        with open(log_file, 'r') as log:
+            lines = log.readlines()
+    except FileNotFoundError:
+        lines = []
+
+    # 查找并替换特定字段
+    field_found = False
+    for i, line in enumerate(lines):
+        if line.startswith("last_down_version = "):
+            lines[i] = f"last_down_version = {version}\n"
+            field_found = True
+            break
+
+    # 如果没有找到字段，则添加新的字段
+    if not field_found:
+        lines.append(f"last_down_version = {version}\n")
+
+    # 写回修改后的内容
+    with open(log_file, 'w') as log:
+        log.writelines(lines)
+        # 其他信息写入
+        if not any(line.startswith("xk730 = ") for line in lines):
+            log.write(f"xk730 = kyzh0730@gmail.com\n")
+
 
 def check_for_updates():
-    print("---更新检查系统版本:1.0.6---")
+    print("---更新检查系统版本:1.1.1---")
     print("正在执行更新检查...")
     ensure_directory_exists(local_directory)
 
