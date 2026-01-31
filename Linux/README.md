@@ -10,6 +10,8 @@
 #该部分的使用方法是：  
 运行start.py(也许是py start.py，也有可能是python start.py 或是别的什么,这决定于你设备上python的安装设置)  
 Run start.py (it may be py start.py or python start.py or ...?, depending on the installation settings of Python on your device)  
+<img width="171" height="54" alt="image" src="https://github.com/user-attachments/assets/b9b1caa8-6c08-4f1e-9032-07b89d4043ec" />
+
 
 #该部分的运作机制是：  
 start.py调用dow.py进行版本自检，如版本为最新则直接启动服务器(服务器在\terraria_server),如dow.py检测到新版本则会下载安装包，后start.py会进行解压更新处理并启动服务器  
