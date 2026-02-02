@@ -4,7 +4,8 @@ import zipfile
 from dow import check_for_updates
 import shutil
 import datetime
-
+import sys
+from contextlib import contextmanager
 
 # 本地目录和文件设置
 local_directory = "./dow"
@@ -13,6 +14,44 @@ log_directory = ""
 server_executable = "./terraria_server/TerrariaServer.bin.x86_64 -config serverconfig.txt -lang zh-Hans"
 server_executable_permission = "./terraria_server"
 extracted_version_log = os.path.join(log_directory, "version_log.txt")
+log_file_path = "console_output.log"
+
+
+
+@contextmanager
+def log_to_file(log_file_path):
+    # 保存原始的 stdout 和 stdin
+    original_stdout = sys.stdout
+    #original_stdin = sys.stdin
+
+    try:
+        with open(log_file_path, 'a') as log_file:
+            # 重定向 stdout 和 stdin 到文件
+            sys.stdout = log_file
+            #sys.stdin = log_file
+            yield
+
+        
+    finally:
+        # 恢复原始的 stdout
+        sys.stdout = original_stdout
+        #sys.stdin = original_stdin
+
+
+class Tee:
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, data):
+        for f in self.files:
+            if f is not None:  # 确保 f 不是 None
+                f.write(data)
+
+    def flush(self):
+        for f in self.files:
+            if f is not None:  # 确保 f 不是 None
+                f.flush()
+            
 
 def ensure_directory_exists(directory):
     if not os.path.exists(directory):
@@ -108,20 +147,54 @@ def update_version_log(log_file_path, version):
         
 def run_server():
     print("---------------------------------------------------")
-    print("         888      8888888888  .d8888b.   .d8888b.  ")
-    print("         888            d88P d88P  Y88b d88P  Y88b ")
-    print("         888           d88P       .d88P 888    888 ")
-    print("888  888 888  888     d88P       8888'  888    888 ")
-    print("`Y8bd8P' 888 .88P    8888         'Y8b. 888    888 ")
-    print("  X88K   888888K    d88P     888    888 888    888 ")
-    print(".d8''8b. 888 '88b  d88P      Y88b  d88P Y88b  d88P ")
-    print("888  888 888  888 d88P        'Y8888P'   'Y8888P'  ")
-    print("                                                   ")
-    print("                                                   ")
-    print("---------------------------------------------------")
+    #print("         888      8888888888  .d8888b.   .d8888b.  ")
+    #print("         888            d88P d88P  Y88b d88P  Y88b ")
+    #print("         888           d88P       .d88P 888    888 ")
+    #print("888  888 888  888     d88P       8888'  888    888 ")
+    #print("`Y8bd8P' 888 .88P    8888         'Y8b. 888    888 ")
+    #print("  X88K   888888K    d88P     888    888 888    888 ")
+    #print(".d8''8b. 888 '88b  d88P      Y88b  d88P Y88b  d88P ")
+    #print("888  888 888  888 d88P        'Y8888P'   'Y8888P'  ")
+    #print("                                                   ")
+    #print("                                                   ")
+    #print("---------------------------------------------------")
+    print("""
+
+        _      _______  ________  ______ 
+       | |    (_______)(_______/ / __   |
+ _   _ | |  _       _     __/ / | | //| |
+( \ / )| | / )     / )   (___ \ | |// | |
+ ) X ( | |< (     / /   _____) )|  /__| |
+(_/ \_)|_| \_)   (_/   (______/  \_____/ 
+                                         
+""")
+    print(f"作者:xk730_kyzh0730@gmail.com")
+
+    
     print("#####正在启动服务器#####")
     try:
         subprocess.run(server_executable, shell=True)
+
+        print("""
+
+        ,----,                                                                                
+      ,/   .`|                                                                                
+    ,`   .'  :                                                                                
+  ;    ;     /                                                          ,--,                  
+.'___,/    ,'               __  ,-.   __  ,-.                 __  ,-. ,--.'|                  
+|    :     |              ,' ,'/ /| ,' ,'/ /|               ,' ,'/ /| |  |,                   
+;    |.';  ;      ,---.   '  | |' | '  | |' |    ,--.--.    '  | |' | `--'_        ,--.--.    
+`----'  |  |     /     \  |  |   ,' |  |   ,'   /       \   |  |   ,' ,' ,'|      /       \   
+    '   :  ;    /    /  | '  :  /   '  :  /    .--.  .-. |  '  :  /   '  | |     .--.  .-. |  
+    |   |  '   .    ' / | |  | '    |  | '      \__\/: . .  |  | '    |  | :      \__\/: . .  
+    '   :  |   '   ;   /| ;  : |    ;  : |      ," .--.; |  ;  : |    '  : |__    ," .--.; |  
+    ;   |.'    '   |  / | |  , ;    |  , ;     /  /  ,.  |  |  , ;    |  | '.'|  /  /  ,.  |  
+    '---'      |   :    |  ---'      ---'     ;  :   .'   \  ---'     ;  :    ; ;  :   .'   \ 
+                \   \  /                      |  ,     .-./           |  ,   /  |  ,     .-./ 
+                 `----'                        `--`---'                ---`-'    `--`---'     
+                                                                                              
+""")
+
         print("服务器已启动")
     except Exception as e:
         print(f"启动服务器时出错: {e}")
@@ -142,8 +215,23 @@ def set_executable_permission(directory):
 
 
 def main():
+    
+    with open(log_file_path, 'a') as log_file:
+        tee = Tee(sys.stdout, log_file)
+        sys.stdout = tee
 
-    print("""
+        print("""
+
+  _____                                _____                
+ |_   _|   ___   _ __   _ __          | ____|  _   _    ___ 
+   | |    / _ \ | '__| | '__|  _____  |  _|   | | | |  / _ \
+   | |   |  __/ | |    | |    |_____| | |___  | |_| | |  __/
+   |_|    \___| |_|    |_|            |_____|  \__, |  \___|
+                                               |___/        
+
+""")
+        
+        print("""
 
            0                              
             0        0    0               
@@ -169,82 +257,81 @@ def main():
            0  0  0   0 000000 0           
              0      0   0 0                
               0      0                    
-               0  0                        
-
-""")
-
-
-
-
-    print(f"---terraria服务端启动程序---")
-    print(f"版本:1.2.4")
-    print(f"作者:xk730_kyzh0730@gmail.com")
-    # 询问是否执行
+               0  0
+               """)
+        print(f"---terraria服务端启动程序---")
+        
+        print(f"版本:1.2.7")
+        
+        
+        
+        # 询问是否执行
 
 
-    print("开始执行更新同步检查...")
+        print("开始执行更新同步检查...")
     
-    check_for_updates()  # 调用 dow.py 中的更新同步检查函数
+        check_for_updates()  # 调用 dow.py 中的更新同步检查函数
 
-    # 初始化最新版本号为 None
-    latest_version = None
+        # 初始化最新版本号为 None
+        latest_version = None
 
-    try:
-        # 尝试打开版本日志文件 "version_log.txt" 以读取最新版本号
-        with open("version_log.txt", 'r') as log:
-            for line in log:
-                # 查找以 "last_down_version = " 开头的行
-                if line.startswith("last_down_version = "):
-                    # 提取版本号并去除两端的空格
+        try:
+            # 尝试打开版本日志文件 "version_log.txt" 以读取最新版本号
+            with open("version_log.txt", 'r') as log:
+                for line in log:
+                    # 查找以 "last_down_version = " 开头的行
+                    if line.startswith("last_down_version = "):
+                        # 提取版本号并去除两端的空格
                     
-                    latest_version = line.split("=")[1].strip()
-                    print(f"最新版本号: {latest_version}")
-                    break  # 找到后立即退出循环
-    except FileNotFoundError:
-        # 如果文件未找到，打印错误信息并返回
-        print("未找到版本日志文件，无法检查更新")
-        return
+                        latest_version = line.split("=")[1].strip()
+                        print(f"最新版本号: {latest_version}")
+                        break  # 找到后立即退出循环
+        except FileNotFoundError:
+            # 如果文件未找到，打印错误信息并返回
+            print("未找到版本日志文件，无法检查更新")
+            return
 
-    # 初始化解压后的版本号为 None
-    extracted_version = None
+        # 初始化解压后的版本号为 None
+        extracted_version = None
 
-    # 检查解压后的版本日志文件是否存在以确定是否需要更新
-    if os.path.exists(extracted_version_log):
-        # 打开解压后的版本日志文件以读取已解压的版本号
-        with open(extracted_version_log, 'r') as log:
-            for line in log:
+        # 检查解压后的版本日志文件是否存在以确定是否需要更新
+        if os.path.exists(extracted_version_log):
+            # 打开解压后的版本日志文件以读取已解压的版本号
+            with open(extracted_version_log, 'r') as log:
+                for line in log:
                 
-                # 查找以 " " 开头的行
+                    # 查找以 " " 开头的行
                 
-                if line.startswith("version = "):
+                    if line.startswith("version = "):
                     
                     # 提取已解压的版本号并去除两端的空格
                     
-                    extracted_version = line.split("=")[1].strip()
+                        extracted_version = line.split("=")[1].strip()
                     
-                    break  # 找到后立即退出循环
+                        break  # 找到后立即退出循环
 
 
-    if latest_version != extracted_version:
-        print("发现新版本("+latest_version+")，准备解压和运行...")
-        user_input = input("建议您在继续更新前手动备份存档，是否继续执行更新？输入 'y' 继续，输入 'n' 则不执行更新，直接启动服务端: ").strip().lower()
-        if user_input != 'y':
-            print("---更新计划已经取消---")
+        if latest_version != extracted_version:
+            print("发现新版本("+latest_version+")，准备解压和运行...")
+            user_input = input("建议您在继续更新前手动备份存档，是否继续执行更新？输入 'y' 继续，输入 'n' 则不执行更新，直接启动服务端: ").strip().lower()
+            if user_input != 'y':
+                print("---更新计划已经取消---")
 
-        elif user_input == 'y':
+            elif user_input == 'y':
             
-            print("---开始更新---...")
+                print("---开始更新---...")
             
-            extract_and_prepare(latest_version)
-    else:
-        print("服务包最新版本为：("+latest_version+")，服务端当前版本为：("+extracted_version+")")
-        print("已是最新版本，即将启动服务器...")
+                extract_and_prepare(latest_version)
+        else:
+            print("服务包最新版本为：("+latest_version+")，服务端当前版本为：("+extracted_version+")")
+            print("已是最新版本，即将启动服务器...")
 
-        # 设置执行权限
-    set_executable_permission(server_executable_permission)
+            # 设置执行权限
+        set_executable_permission(server_executable_permission)
 
         
-    run_server()
+        run_server()
+
 
 if __name__ == "__main__":
     main()
