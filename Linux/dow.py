@@ -172,7 +172,7 @@ def log_version(version):
 
 
 def check_for_updates():
-    print("---更新检查系统版本:1.2.7---")
+    print("---更新检查系统版本:1.2.8---")
     print("正在执行更新检查...")
     ensure_directory_exists(local_directory)
 
@@ -252,3 +252,4 @@ def check_for_updates():
 
 if __name__ == "__main__":
     check_for_updates()
+
