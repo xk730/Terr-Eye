@@ -172,7 +172,7 @@ def log_version(version):
 
 
 def check_for_updates():
-    print("---更新检查系统版本:1.2.5---")
+    print("---更新检查系统版本:1.2.8---")
     print("正在执行更新检查...")
     ensure_directory_exists(local_directory)
 
@@ -185,13 +185,36 @@ def check_for_updates():
     
     print(f"移动端服务器最新版本: {mobile_version}")
 
+    local_versions = get_local_versions(local_directory)
+
+
+    local_versions_are_latest = (
+    any(mobile_version > local_version for local_version in local_versions) or
+    any(pc_version > local_version for local_version in local_versions)
+)
+
+
+    if local_versions_are_latest:
+
+        print("---本地版本已是最新，无需更新---")
+
+        return
+
+       
+
+    else:
+        print("---发现新版本---")
+    #     dow_input = input("请选择下载的服务端类型：移动端服务器请输入1, PC端服务器请输入2:")
+
+
+
     dow_input = input("请选择下载的服务端类型：移动端服务器请输入1, PC端服务器请输入2:")
 
     
 
     print("dow_input="+dow_input)
 
-    local_versions = get_local_versions(local_directory)
+    #local_versions = get_local_versions(local_directory)
 
     if dow_input == '1':
         selected_version = mobile_version
@@ -204,9 +227,13 @@ def check_for_updates():
         return
 
     # 提取版本号
+    print(f"selected_version: {selected_version}, type: {type(selected_version)}")
+
+
     selected_remote_version = selected_version.split("-")[2].replace(".zip", "")
 
-    print(f"selected_remote_version = {selected_remote_version}")
+    #print(f"selected_remote_version = {selected_remote_version}")
+    
     if all(selected_remote_version > local_version for local_version in local_versions):
         
         download_successful = download_file(selected_version, dow_input)
@@ -225,3 +252,4 @@ def check_for_updates():
 
 if __name__ == "__main__":
     check_for_updates()
+
