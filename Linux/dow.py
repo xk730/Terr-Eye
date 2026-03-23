@@ -28,7 +28,8 @@ def get_remote_versions():
     try:
         response = requests.get(version_api_url)
         response.raise_for_status()
-        versions = list(set(response.json()))  # 去重并转换为列表
+        versions = list((response.json()))  # 去重并转换为列表
+        #versions = list(set(response.json()))  # 转换为列表
         print(f"成功获取远程版本信息-{response}")
         print(f"官网最新版本api: {versions}\n")
         
@@ -172,7 +173,7 @@ def log_version(version):
 
 
 def check_for_updates():
-    print("---更新检查系统版本:1.2.8---")
+    print("---更新检查系统版本:1.2.9---")
     print("正在执行更新检查...")
     ensure_directory_exists(local_directory)
 
@@ -182,16 +183,21 @@ def check_for_updates():
     pc_version, mobile_version = get_remote_versions()
     
     print(f"电脑端服务器最新版本: {pc_version}")
+    pc_version_tq = pc_version.split("-")[2].replace(".zip", "")
     
     print(f"移动端服务器最新版本: {mobile_version}")
+    mobile_version_tq = mobile_version.split("-")[2].replace(".zip", "")
 
     local_versions = get_local_versions(local_directory)
 
 
     local_versions_are_latest = (
-    any(mobile_version > local_version for local_version in local_versions) or
-    any(pc_version > local_version for local_version in local_versions)
-)
+    any(mobile_version_tq <= local_version for local_version in local_versions) or
+    any(pc_version_tq <= local_version for local_version in local_versions)
+    )
+    #print(f"---测试:mobile_版本{mobile_version_tq}---")
+    #print(f"---测试:pc_版本{pc_version_tq}---")
+    #print(f"---测试:本地版本{local_versions}---")
 
 
     if local_versions_are_latest:
@@ -252,4 +258,3 @@ def check_for_updates():
 
 if __name__ == "__main__":
     check_for_updates()
-
